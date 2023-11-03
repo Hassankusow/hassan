@@ -1,0 +1,23 @@
+// hero.h
+#include <iostream>
+#include <cctype>
+#include <cstring>
+#include <fstream>
+const int MAX_SUPERHEROES = 20;
+
+
+    struct HeroData {
+        char name[50];
+        char power[100];
+        char description[100];
+        char fact[100];
+        char universe[50];
+        int age;
+    };
+    void displayMenu();
+    char getMenuChoice();
+    void add_Superhero(HeroData &newHero);
+    void display_Superheroes(const HeroData superheroes[], int numSuperheroes);
+    int load_File(HeroData superheroes[]);
+    void save_File(const HeroData superheroes[], int num);
+    void match_hero(const HeroData superheroes[], int numSuperheroes);
