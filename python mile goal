@@ -1,0 +1,79 @@
+#include <iostream>
+using namespace std;
+void welcome();
+void getInput(int &goal);
+int calcTotal();
+int main() {
+ int ran;
+  int goal; 
+  welcome();
+  
+  getInput(goal);
+   if (goal <=0) {
+            cout<<"No miles were tracked this week."  << endl;
+    cout <<  "Keep riding!";
+     return 0;
+        }
+  ran=calcTotal();
+  if (goal == ran) {
+    cout << "You rode "+to_string(ran)<< " miles this week."<<endl
+        <<"Good job! You met your goal!"<<endl
+        <<"Keep riding!";
+  }
+  else if (goal>ran){cout <<"You rode "+to_string(ran)<< " miles this week."<<endl <<
+    "Uh oh! You missed your goal by " +to_string  (goal-ran)<< " miles!"
+   <<endl <<"Keep riding!";
+}
+  else if (goal<ran){cout <<"You rode "+to_string(ran)<< " miles this week."<<endl <<
+    "Great job! You exceeded your goal by "+to_string (ran-goal)<<  " miles!"<<endl<<
+    "Keep riding!";
+}
+  
+}
+void welcome (){
+ cout << "Welcome to my Miles Tracker program." << endl;
+  cout << "How many miles do you want to ride this week? ";
+}
+void getInput(int &goal){
+  cin>> goal;
+}
+int calcTotal( ){
+const int days = 7;
+  int score;
+  int result=0;
+    for (unsigned int i = 0; i < days;  i++) {
+      string day;
+        switch (i) {
+            case 0:
+                day = "Sunday";
+                break;
+            case 1:
+                day = "Monday";
+                break;
+            case 2:
+                day = "Tuesday";
+                break;
+            case 3:
+                day = "Wednesday";
+                break;
+            case 4:
+                day = "Thursday";
+                break;
+            case 5:
+                day = "Friday";
+                break;
+            case 6:
+                day = "Saturday";
+                break;
+        } 
+     cout << "How many miles did you ride "+day<< ": ";
+      cin >> score;
+       while (score < 0) {
+            cout << "How many miles did you ride "<<day<< " again: ";
+            cin >> score;
+        }
+  result +=score;
+    }
+  
+  return result;
+}
