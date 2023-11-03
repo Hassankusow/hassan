@@ -1,0 +1,32 @@
+int main() {
+    node* head = nullptr; // Initialize an empty linked list
+    char choice;
+
+    // Seed the random number generator
+    srand(time(0));
+
+    do {
+        welcome();
+        choice = get_menu();
+
+        switch (choice) {
+            case 'a':
+                problem_input(head);
+                break;
+            case 'b':
+                display_all(head);
+                break;
+            case 'c':
+                display_random(head);
+                break;
+            case 'd':
+                destroy(head);
+                cout << "Goodbye" << endl;
+                break;
+            default:
+                cout << "Invalid choice. Please try again." << endl;
+        }
+    } while (choice != 'd');
+
+    return 0;
+}
