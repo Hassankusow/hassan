@@ -1,0 +1,25 @@
+// my headers
+#include <iostream>
+#include <ctime>
+#include <cstdlib>
+
+// struct for practice problem
+struct PracticeProblem {
+    char *title;
+    char *details;
+    char *prototype;
+    char *additionalItem;
+};
+// my struct node
+struct node{
+	PracticeProblem list;
+	node *next;
+};
+// my function defintions
+ void display_all(node * head);
+ void welcome();
+ char get_menu();
+ void problem_input(node * &head);
+ void display_random(node * head);
+ void destroy(node* &head);
+
