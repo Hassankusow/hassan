@@ -1,35 +1,40 @@
-OBJS = ex-1.o ex-2.o ex-3.o ex-4.o
-CSRCS = ex-1.c ex-2.c ex-3.c ex-4.c
-ASRCS = 
-COBJS = ex-1.o ex-2.o ex-3.o ex-4.o
-AOBJS = 
-HELLOOBJS = ex-1.o ex-2.o ex-3.o ex-4.o
+OBJS = main.o prime.o primee.o
+CSRCS = main.c primee.c
+ASRCS = prime.asm
+COBJS = main.o primee.o 
+AOBJS = prime.o
+HELLOOBJS = main.o primee.o
 CFLAGS = -m32 -g3 -O0 -Wall -Werror -std=c11 -pedantic
 AFLAGS = -f elf32 -g3 -F dwarf
 LDFLAGS = -m32 -lm -no-pie
-TARGETS = ex-1 ex-2 ex-3 ex-4
-LISTINGS = 
+TARGETS = main primee prime
+LISTINGS = prime.lst
 CC = gcc
 AS = nasm
 
+#default target
 all: $(TARGETS)
 
 .PHONY: clean
 
+#there are some special make automatic variables
+# @ is the target filename
+# * is the basename of the target filename
+# < is the first dependency
+# there are others, but these are the ones we will be using
 $(AOBJS): $(ASRCS)
-	$(AS) $(AFLAGS) -o $(@) -1 $(*).lst $(<)
+	$(AS) $(AFLAGS) -o $(@) -l $(*).lst $(<)
 
+# Rule to build object files
+# -c is special in that it can use automatic variables with automatic rename from .c to .o
 $(COBJS): $(CSRCS)
 	$(CC) $(CFLAGS) -c $(@:.o=.c)
 
 output: $(HELLOOBJS)
-	$(CC) $(LDFLAGS) $(HELLOOBJS) -o $(@)
+	$(CC) $(LDFLAGS) $(HELLOOBJS) -o $(@) -lm
 
-
-
-ex-4: ex-4.c
-	$(CC) $(CFLAGS) $< -o $@ -lm
+logic: prime.o
+	$(CC) $(LDFLAGS) $(<) -o logic
 
 clean:
 	rm -f $(OBJS) $(LISTINGS) $(TARGETS)
-
