@@ -1,14 +1,14 @@
-OBJS = main.o prime.o primee.o
-CSRCS = main.c primee.c
-ASRCS = prime.asm
-COBJS = main.o primee.o 
-AOBJS = prime.o
-HELLOOBJS = main.o primee.o
+OBJS =  sizeof.o
+CSRCS = sizeof.c
+ASRCS = 
+COBJS = sizeof.o
+AOBJS = 
+HELLOOBJS = sizeof.o
 CFLAGS = -m32 -g3 -O0 -Wall -Werror -std=c11 -pedantic
 AFLAGS = -f elf32 -g3 -F dwarf
 LDFLAGS = -m32 -lm -no-pie
-TARGETS = main primee prime
-LISTINGS = prime.lst
+TARGETS = sizeof
+LISTINGS = 
 CC = gcc
 AS = nasm
 
@@ -30,10 +30,10 @@ $(AOBJS): $(ASRCS)
 $(COBJS): $(CSRCS)
 	$(CC) $(CFLAGS) -c $(@:.o=.c)
 
-output: $(HELLOOBJS)
-	$(CC) $(LDFLAGS) $(HELLOOBJS) -o $(@) -lm
+hello: $(HELLOOBJS)
+	$(CC) $(LDFLAGS) $(HELLOOBJS) -o $(@)
 
-logic: prime.o
+logic: 
 	$(CC) $(LDFLAGS) $(<) -o logic
 
 clean:
