@@ -1,13 +1,13 @@
-OBJS =  sizeof.o
-CSRCS = sizeof.c
+OBJS =  values.o
+CSRCS = values.c
 ASRCS = 
-COBJS = sizeof.o
+COBJS = values.o
 AOBJS = 
-HELLOOBJS = sizeof.o
+HELLOOBJS = values.o
 CFLAGS = -m32 -g3 -O0 -Wall -Werror -std=c11 -pedantic
 AFLAGS = -f elf32 -g3 -F dwarf
 LDFLAGS = -m32 -lm -no-pie
-TARGETS = sizeof
+TARGETS = values
 LISTINGS = 
 CC = gcc
 AS = nasm
@@ -38,3 +38,4 @@ logic:
 
 clean:
 	rm -f $(OBJS) $(LISTINGS) $(TARGETS)
+
