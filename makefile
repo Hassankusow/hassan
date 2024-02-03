@@ -1,13 +1,13 @@
-OBJS =  values.o
-CSRCS = values.c
+OBJS = index_functions.o
+CSRCS = index_functions.c
 ASRCS = 
-COBJS = values.o
+COBJS = index_functions.o
 AOBJS = 
-HELLOOBJS = values.o
+HELLOOBJS = index_functions.o
 CFLAGS = -m32 -g3 -O0 -Wall -Werror -std=c11 -pedantic
 AFLAGS = -f elf32 -g3 -F dwarf
 LDFLAGS = -m32 -lm -no-pie
-TARGETS = values
+TARGETS = index_functions
 LISTINGS = 
 CC = gcc
 AS = nasm
@@ -30,12 +30,13 @@ $(AOBJS): $(ASRCS)
 $(COBJS): $(CSRCS)
 	$(CC) $(CFLAGS) -c $(@:.o=.c)
 
+
+
 hello: $(HELLOOBJS)
 	$(CC) $(LDFLAGS) $(HELLOOBJS) -o $(@)
 
-logic: 
+logic: logic_ops2.o
 	$(CC) $(LDFLAGS) $(<) -o logic
 
 clean:
 	rm -f $(OBJS) $(LISTINGS) $(TARGETS)
-
