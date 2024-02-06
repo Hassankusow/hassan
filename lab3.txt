@@ -1,0 +1,27 @@
+
+bool LinkedList::del(char ch) {
+    return delRecursive(head, ch);
+}
+
+bool LinkedList::delRecursive(Node*& current, char ch) {
+    if (current == nullptr) {
+        return false;
+    }
+
+    if (current->data == ch) {
+        Node* temp = current;
+        current = temp->next;
+        delete temp;
+        return true;
+    }
+
+    return delRecursive(current->next, ch);
+}
+x y z 
+found y
+x z 
+did not find y
+z 
+did not find y
+
+did not find y
