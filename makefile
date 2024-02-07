@@ -1,15 +1,37 @@
-CC = g++
-CPPFLAGS = -std=c++11 -g -Wall
-OBJTS = main.o song.o list.o
+OBJS = getopt.o
+CSRCS = getopt.c
+ASRCS =
+COBJS = getopt.o
+AOBJS =
+HELLOOBJS = getopt.o
+CFLAGS = -m32 -g3 -O0 -Wall -Werror -std=c11 -pedantic
+AFLAGS = -f elf32 -g3 -F dwarf
+LDFLAGS = -m32 -lm -no-pie
+TARGETS = getopt
+LISTINGS =
+CC = gcc
+AS = nasm
 
-output: $(OBJTS)
-	$(CC) $(CPPFLAGS) -o output $(OBJTS)
+#default target
+all: $(TARGETS)
 
-main.o: song.h list.h myutil.h
+.PHONY: clean
 
-song.o: song.h myutil.h
+$(AOBJS): $(ASRCS)
+	$(AS) $(AFLAGS) -o $(@) -l $(*).lst $(<)
 
-list.o: list.h song.h myutil.h
+# Rule to build object files
+# -c is special in that it can use automatic variables with automatic rename from .c to .o
+$(COBJS): $(CSRCS)
+	$(CC) $(CFLAGS) -c $(@:.o=.c)
+
+
+
+hello: $(HELLOOBJS)
+	$(CC) $(LDFLAGS) $(HELLOOBJS) -o $(@)
+
+logic: 
+	$(CC) $(LDFLAGS) $(<) -o logic
 
 clean:
-	rm output *.o
+	 rm -f $(OBJS) $(LISTINGS) $(TARGETS)
