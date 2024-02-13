@@ -1,0 +1,51 @@
+#include "dlist.h"
+
+//put the implmenetation of the required functions here
+
+int countEven(node * head){
+    int count = 0;
+    if(!head){
+	head = new node;
+	count = 0;
+	return count;
+    }
+    if (head->data % 2 == 0)
+	    count+=1;
+    count +=countEven(head->next);
+    return count;
+
+
+
+}
+int removeEven(node *& head) {
+    int count = 0;
+    if (!head) {
+        return 0;
+    }
+
+    if (head->data % 2 == 0) {
+        node *temp = head;
+        head = head->next;
+        delete temp; 
+        count += 1; 
+        
+        count += removeEven(head);
+    } else {
+        
+        count += removeEven(head->next);
+    }
+
+    return count;
+}
+
+
+Here is the original list: 2 -> 2 -> 15 -> 2 -> 54 -> 34 -> 2
+
+This list contains 7 number of items 
+The number of even numbers in the list is: 6
+The number of even numbers removed from the list is: 6
+
+
+The resulting list is... 15
+
+
