@@ -1,40 +1,35 @@
-#comments look like this
-#variables typically at the top of the file
-OBJS = getopt_long.o
-CSRCS = getopt_long.c
-ASRCS = 
-COBJS = getopt_long.o
+OBJS = lab1.o hex_func.o
+CSRCS = lab1.c hex_func.c
+COBJS = lab1.o 
 AOBJS = 
-HELLOOBJS = getopt_long.o
+HELLOOBJS = hex_func.o
 CFLAGS = -m32 -g3 -O0 -Wall -Werror -std=c11 -pedantic
 AFLAGS = -f elf32 -g3 -F dwarf
 LDFLAGS = -m32 -lm -no-pie
-TARGETS = getopt_long
+TARGETS = lab1 
 LISTINGS = 
 CC = gcc
 AS = nasm
 
+HEADERS = getopt.h 
+
 #default target
 all: $(TARGETS)
 
-HEADERS = getopt.h
-
-
 .PHONY: clean
-
 
 $(AOBJS): $(ASRCS)
 	$(AS) $(AFLAGS) -o $(@) -l $(*).lst $(<)
 
-
-$(COBJS): $(CSRCS) $(HEADERS)
+$(COBJS): $(CSRCS) $(HEADERS)  
 	$(CC) $(CFLAGS) -c $(@:.o=.c)
 
-hello: $(HELLOOBJS)
-	$(CC) $(LDFLAGS) $(HELLOOBJS) -o $(@)
+lab1: $(COBJS)
+	$(CC) $(LDFLAGS) $(COBJS) -o $(@)
 
-logic: 
+logic: logic_ops2.o
 	$(CC) $(LDFLAGS) $(<) -o logic
 
 clean:
 	rm -f $(OBJS) $(LISTINGS) $(TARGETS)
+
