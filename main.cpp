@@ -1,76 +1,94 @@
+#include "queue.h"
+#include "stack.h"
+
+
 #include <iostream>
-#include "list.h"  // Include the header file for your List class
 
-using namespace std;
+int main() {
+    Queue myQueue;
+    Stack myStack;
 
-int main(){
-
-	
-    List songList;
+    char filename[] = "reservoa.txt";
+    char clients[] = "clients.txt";
+    //myStack.loadfromFile(clients);
+    //myQueue.loadFromFile(filename);
+    bool ans;
     int choice;
-    char name[20];
 
-    // loading from file
-    songList.loadFromFile("song.txt");
+    info groupinfo;
 
-    do{
-	cout << "Menu:\n"
-             << "1. Add a new song\n"
-             << "2. Display all songs\n"
-             << "3. Display all songs for an artist\n"
-             << "4. Remove all songs with fewer M likes\n"
+    do {
+        cout << "Menu:\n"
+             << "1. Add a group to the waiting list\n"
+             << "2. Seat a group\n"
+             << "3. Display waiting list\n"
+             << "4. Add customer to promotional list\n"
+             << "5. Contact customers for promotions\n"
+             << "6. Display promotional list\n"
              << "0. Quit the program\n";
 
-        
         cout << "Enter your choice: ";
         cin >> choice;
 
-        switch (choice){
-
-
+        switch (choice) {
             case 1: {
-                
-                 Song newSong;
-                 newSong.inputSong(); 
-                 songList.addSong(newSong); 
+                // gets info from info and then passes stores in a circular lll in enqueue function 
+                groupinfo.inputgroup();
+                myQueue.enqueue(groupinfo);
                 break;
             }
             case 2: {
-        
-                songList.displayAllSongs();  
-                break;
-            }
-            case 3: {
+                // to remove the steated indviduls from the list 
+                ans = myQueue.dequeue(groupinfo);
+                if (ans == true)
+                   cout << "The group: " << groupinfo.get_group() << " has been seated" << endl;
 
-	        cin.ignore();
-		cout << "Enter a arist name: ";
-		cin.get(name,20,'\n');
-                songList.displaySongsForArtist(name); 
+               break;
+                    }
+            case 3: {
+                // Display waiting list
+                myQueue.display();
                 break;
             }
             case 4: {
-                int m;
-		cout <<"Enter the likes: ";
-		cin >> m;
-		songList.removeSongsWithFewerLikes(m);
+	        // this is for the push client where if the client its not none for promotional materials 
+                if (strcmp(groupinfo.getname(), "None") != 0) 
+                    myStack.push(groupinfo);
+
+                break;
+            }
+            case 5: {
+	       // this does a peek where peeks at the client info and then pops becouse we took a peek and then we contacted him/her
+               ans = myStack.peek(groupinfo);
+	       if ( ans == true)
+               cout << "THe person: " << groupinfo.getname() << " is in the prosces of being contacted" << endl;	       
+               ans = myStack.pop(groupinfo);
+	    
+	       if ( ans == true)
+	       cout << "THe person: " << groupinfo.getname() << " has been removed from the list" << endl;
+	       else 
+		       cout <<"empty" << endl;
+                
+                break;
+            }
+            case 6: {
+	       // display my client lists 
+                myStack.display(groupinfo);
                 break;
             }
             case 0: {
-                // Quit the program
+                // Quit the program save in savetofile
                 cout << "Exiting program.\n";
-		songList.saveToFile("song.txt");
+                myQueue.savetofile(filename);
+		myStack.savetofile(clients);
                 return 0;
             }
             default: {
                 cout << "Invalid choice. Please enter a valid option.\n";
                 break;
             }
-
-        
         }
-
-
-    }while(choice != 0);
-
+    } while (choice != 0);
+    
     return 0;
 }
