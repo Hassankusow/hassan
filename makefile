@@ -1,17 +1,15 @@
 CC = g++
 CPPFLAGS = -std=c++11 -g -Wall
-OBJTS = main.o line.o stack.o queue.o
+OBJTS = main3.o web.o table.o
 
 output: $(OBJTS)
 	$(CC) $(CPPFLAGS) -o output $(OBJTS)
 
-main.o: stack.h line.h myutil.h queue.h
+main3.o: web.h table.h
 
-line.o: myutil.h
+web.o: web.h
 
-stack.o: line.h stack.h myutil.h
-
-queue.o: line.h queue.h myutil.h
+table.o: table.h web.h 
 
 clean:
 	rm output *.o
