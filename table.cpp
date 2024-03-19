@@ -1,316 +1,345 @@
 #include "table.h"
-
-// constructor 
-Table::Table() : size(0)
+Table::Table() : root(nullptr), size(0)
 {
-        currCapacity = INIT_CAP;
-        aTable = new Node*[currCapacity];
-        for(int i=0; i<currCapacity; i++)
-        {
-                aTable[i] = nullptr;
-        }
 }
 
-//copy constructor
-Table::Table(const Table& aTable) : aTable(nullptr), size(0)
+Table::Table(const Table& aTable) : root(nullptr), size(0)
 {
         *this = aTable;
 }
 
-
-//destructor
 Table::~Table()
 {
-        destroy();
+        destroy(root);
 }
 
-// destroying table
-void Table::destroy()
+void Table::destroy(Node *& currRoot)
 {
-        for(int i=0; i<currCapacity; i++)
+        if(currRoot)
         {
-                destroyChain(aTable[i]);
-        }
-        if(aTable)
-                delete [] aTable;
-}
-
-// destroy chain
-void Table::destroyChain(Node *& currHead)
-{
-        if(currHead)
-        {
-                destroyChain(currHead->next);
-                delete currHead->data;
-                delete currHead;
-                currHead = nullptr;
+                destroy(currRoot->left);
+                destroy(currRoot->right);
+                delete currRoot->data;
+                delete currRoot;
+                currRoot = nullptr;
         }
 }
 
-// adding the info to my chain
+
 void Table::add(const info& ainfo)
 {
-        int     index = calculateIndex(ainfo.get_topic());
-        Node *  newNode = new Node(ainfo);
-        newNode->next = aTable[index];
-        aTable[index] = newNode;
+        add(this->root, ainfo);
         size++;
 }
 
-
-//calculating where my index of chain will be 
-int Table::calculateIndex(const char * key) const
+void Table::add(Node *& currRoot, const info& ainfo)
 {
-        int hashingResult;
-        hashingResult = 0;
-        for(; *key != '\0'; key++)
+    if (!currRoot)
+    {
+        currRoot = new Node(ainfo);
+    }
+    else if (strcmp(ainfo.get_topic(), currRoot->data->get_topic()) < 0)
+    {
+        add(currRoot->left, ainfo);
+    }
+    else
+    {
+        add(currRoot->right, ainfo);
+    }
+}
+
+bool Table::remove(const char* key, info& ainfo) {
+    return remove(root, key, ainfo);
+}
+
+bool Table::remove(Node*& currRoot, const char* key, info& ainfo) {
+    if (!currRoot) {
+        return false;
+    }
+    int temp = strcmp(key, currRoot->data->get_name());
+    if (temp == 0) {
+        ainfo = *(currRoot->data);
+        deleteNode(currRoot);
+        size--;
+        return true;
+    } else if (temp < 0) {
+        return remove(currRoot->left, key, ainfo);
+    } else {
+        return remove(currRoot->right, key, ainfo);
+    }
+}
+
+
+bool Table::remove_topic(const char* topic) {
+    return remove_to(root, topic); 
+}
+
+
+bool Table::remove_to(Node*& currRoot, const char* topic) {
+    if (!currRoot) {
+        return false;
+    }
+    bool removed = false;
+    if (strcmp(topic, currRoot->data->get_topic()) == 0) {
+        deleteNode(currRoot); 
+        size--; 
+        removed = true; 
+    }
+    
+    removed = remove_to(currRoot->left, topic) || remove_to(currRoot->right, topic) || removed;
+    return removed; 
+}
+
+
+void Table::deleteTree(Node*& currRoot) {
+    if (currRoot) {
+        deleteTree(currRoot->left);
+        deleteTree(currRoot->right);
+        deleteNode(currRoot); 
+        currRoot = nullptr; 
+    }
+}
+
+void Table::deleteNode(Node *& target)
+{
+       
+        if(!target->left && !target->right)
         {
-                hashingResult += *key;
+                delete target->data;
+                delete target;
+                target = nullptr;
         }
-         return hashingResult % currCapacity;
-}
-
-
-
-// Display websites based on topic
-bool Table::display_topic(const char* topic_keyword, info* all_matches, int& num_found) const {
-    int index = calculateIndex(topic_keyword);
-    Node* curr = aTable[index];
-    num_found = 0;
-    bool found = false;
-    while (curr != nullptr) {
-        if (strcmp(curr->data->get_topic(), topic_keyword) == 0) {
-            all_matches[num_found++] = *(curr->data);
-            found = true;
-        }
-        curr = curr->next;
-    }
-    return found;
-}
-
-
-
-// Copy chain
-void Table::copyChain(Node* srcHead, Node*& destHead) {
-    if (srcHead == nullptr) {
-        destHead = nullptr;
-        return;
-    }
-    destHead = new Node(*(srcHead->data));
-    Node* srcCurr = srcHead->next;
-    Node* destCurr = destHead;
-    while (srcCurr != nullptr) {
-        destCurr->next = new Node(*(srcCurr->data));
-        srcCurr = srcCurr->next;
-        destCurr = destCurr->next;
-    }
-}
-
-
-// Display chain R for display all chains recuisivley 
-void Table::displayChain(std::ostream& out, Node* currHead) const {
-    Node* curr = currHead;
-    while (curr != nullptr) {
-        out << *(curr->data) << std::endl;
-        curr = curr->next;
-    }
-}
-
-
-// display all chains
-void Table::displayAll() const {
-    for (int i = 0; i < currCapacity; ++i) {
-        displayChain(std::cout, aTable[i]);
-    }
-}
-
-
-// Write out chain to file
-void Table::writeOutChain(ostream& out, Node * currHead) const
-{
-        if(currHead)
+        
+        else if(!target->right)
         {
-                out << currHead->data->get_topic() << ';' << currHead->data->get_name() << ';'
-                    << currHead->data->get_rating() << ';' << currHead->data->get_review() << endl;
-                writeOutChain(out, currHead->next);
+                Node * temp = target;
+                target = target->left;
+                delete temp->data;
+                delete temp;
+        }
+       
+        else if(!target->left)
+        {
+                Node * temp = target;
+                target = target->right;
+                delete temp->data;
+                delete temp;
+        }
+        
+        else
+        {
+                
+                Node * prev = nullptr;
+                Node * curr = target->right;    
+                if(!curr->left)                                 
+                {
+                        target->right = curr->right;
+                }
+                else
+                {
+                        while(curr->left)
+                        {
+                                prev = curr;
+                                curr = curr->left;                      
+                        }
+                        prev->left = curr->right;
+                }
+                delete target->data;
+                target->data = curr->data;
+                delete curr;
+                return;
         }
 }
+bool Table::retrieve(const char* key, info& ainfo) const {
+    return retriev(root, key, ainfo); 
+}
 
+bool Table::retriev(Node* currRoot, const char* key, info& ainfo) const{
+    if (currRoot == nullptr) {
+        return false;
+    }
 
-//input operator
-const Table& Table::operator= (const Table& currtable)
+    
+    int compareResult = strcmp(key, currRoot->data->get_name());
+
+    if (compareResult == 0) {
+        
+        ainfo = *(currRoot->data);
+        return true;
+    } else if (compareResult < 0) {
+        
+        return retriev(currRoot->left, key, ainfo);
+    } else {
+        
+        return retriev(currRoot->right, key, ainfo);
+    }
+}
+
+const Table& Table::operator= (const Table& tableSrc)
 {
-        if(this == &currtable)
+        if(this == &tableSrc)
                 return *this;
-        if(this->aTable)
+        if(this->root)
         {
-                destroy();
+                destroy(this->root);
         }
-        size = currtable.size;
-        currCapacity = currtable.currCapacity;
-        aTable = new Node*[currCapacity];
-        for(int i=0; i<currCapacity; i++)
-        {
-                aTable[i] = nullptr;
-                copyChain(currtable.aTable[i], this->aTable[i]);
-        }
+        size = tableSrc.size;
+        copy(tableSrc.root, this->root);
         return *this;
 }
 
-//output operatoer
-ostream& operator<< (ostream& out, const Table& currTable)
+void Table::copy(Node * srcRoot, Node *& destRoot)
 {
-        out << endl << "Displaying the table ..." << endl;
-        for(int i=0; i<currTable.currCapacity; i++)
+        if(srcRoot)
         {
-                out << "Chain #" << i << " ... " << endl;
-                currTable.displayChain(out, currTable.aTable[i]);
-                out << endl;
+                destRoot = new Node(*(srcRoot->data));
+                copy(srcRoot->left, destRoot->left);
+                copy(srcRoot->right, destRoot->right);
         }
+        else
+        {
+                destRoot = nullptr;
+        }
+}
+ostream& operator<< (ostream& out, const Table& srcTable)
+{
+        out << endl << "Displaying the tree ..." << endl;
+        srcTable.display(out, srcTable.root);
         return out;
 }
 
 
-
-// perfomance where it posts my hashtable compeplete and where are my chanis and thier lenths (the data)
-void Table::monitorPerformance() const {
-    for (int i = 0; i < currCapacity; ++i) {
-        int count = 0;
-        Node* curr = aTable[i];
-        while (curr != nullptr) {
-            ++count;
-            curr = curr->next;
+void Table::display(ostream& out, Node * currRoot) const
+{
+        
+        out << endl << "In-order showing the tree ..." << endl;
+        displayInorder(out, currRoot);
+        
+}
+void Table::displayInorder(ostream& out, Node * currRoot) const
+{
+        if(currRoot)
+        {
+                displayInorder(out, currRoot->left);
+                out << *(currRoot->data) << endl;
+                displayInorder(out, currRoot->right);
         }
-        std::cout << "Chain " << i << " Length: " << count << std::endl;
+}
+
+int Table::height() const {
+    return height(root, 0); 
+}
+
+int Table::height(Node* currRoot, int level) const {
+    if (currRoot == nullptr) {
+        return -1;
     }
-}
 
+    
+    cout << "Node: " << currRoot->data->get_name() << " at level " << level << endl;
 
-// Edit review and rating
-void Table::edit(const char* topic, const char* name, const char* new_review, int new_rating) {
-    int index = calculateIndex(topic);
-    Node* curr = aTable[index];
-    while (curr != nullptr) {
-        if (strcmp(curr->data->get_topic(), topic) == 0 && strcmp(curr->data->get_name(), name) == 0) {
-            curr->data->set_review(new_review);
-            curr->data->set_rating(new_rating);
-            break;
-        }
-        curr = curr->next;
-    }
+    
+    int leftHeight = height(currRoot->left, level + 1); 
+    int rightHeight = height(currRoot->right, level + 1); 
+
+    
+    return 1 + max(leftHeight, rightHeight);
 }
 
 
 
-// retreval function where it gives the user the amount of wbsites for a specific topic
-bool Table::retrieve(const char* topic_keyword, info* all_matches, int& num_found) const {
-    int index = calculateIndex(topic_keyword);
-    Node* curr = aTable[index];
-    num_found = 0;
-    bool found = false;
-    while (curr != nullptr) {
-        if (strcmp(curr->data->get_topic(), topic_keyword) == 0) {
-            all_matches[num_found++] = *(curr->data);
-            found = true;
-            num_found+=1;
-        }
-        curr = curr->next;
-    }
-    return found;
-}
-
-
-// my 1 star removeal
-
-void Table::remove() {
-    bool found = false;
-    for (int i = 0; i < currCapacity; ++i) {
-        Node* curr = aTable[i];
-        Node* prev = nullptr;
-        while (curr != nullptr) {
-            if (curr->data->get_rating() == 1) {
-                if (prev == nullptr) {
-                    aTable[i] = curr->next;
-                    delete curr->data;
-                    delete curr;
-                    curr = aTable[i];
-		    found = true;
-                } else {
-                    prev->next = curr->next;
-                    delete curr->data;
-                    delete curr;
-                    curr = prev->next;
-                }
-                size--;
-            } else {
-                prev = curr;
-                curr = curr->next;
-}
-             if (found){
-		     cout << "Website deleted!!" << endl;
-		     }
-             else {
-		     cout << "Website with 1 start not found!!" << endl;
-	     }
-}}}
-
-
-// load from file 
 void Table::loadFromFile(const char * fileName)
 {
-        ifstream        in;
-        info            currInfo;
-        const int       MAX_CHAR = 101;
-        char            currTopic[MAX_CHAR];
-	char            currName[MAX_CHAR];
-	char            currReview[MAX_CHAR];
-        int             currRating;
+    ifstream in;
+    info currInfo;
+    const int MAX_CHAR = 101;
+    char currTopic[MAX_CHAR];
+    char currName[MAX_CHAR];
+    char currReview[MAX_CHAR];
+    int currRating;
+    info* tempArray;
+    int index = 0;
+    int numberOfRecords;
 
-        in.open(fileName);
-        if(!in)
-        {
-                cerr << "Fail to open " << fileName << " for reading!" << endl;
-                exit(1);
-        }
-        cin.ignore();
+    in.open(fileName);
+    if (!in)
+    {
+        cerr << "Fail to open " << fileName << " for reading!" << endl;
+        exit(1);
+    }
+    in >> numberOfRecords;
+     if (in.eof()) {
+        cout << "File is empty." << endl;
+        in.close();
+        return;
+    }
+    in.ignore(MAX_CHAR, '\n');
+    tempArray = new info[numberOfRecords];
+
+    while (index < numberOfRecords && in.get(currName, MAX_CHAR, ';'))
+    {
+        in.ignore(); // Ignore the delimiter
+
         in.get(currTopic, MAX_CHAR, ';');
-        while(!in.eof())
-        {
-         in.getline(currName, MAX_CHAR, ';');
-         in.getline(currReview, MAX_CHAR, ';');
-         in >> currRating;
-         in.ignore(MAX_CHAR, '\n');
+        in.ignore(); // Ignore the delimiter
 
-         // Create an info object and populate it
-         info currInfo;
-         currInfo.set_name(currName);
-         currInfo.set_topic(currTopic);
-         currInfo.set_review(currReview);
-         currInfo.set_rating(currRating);
-        
-        // Add the info object to the table
-         add(currInfo);
+        in.get(currReview, MAX_CHAR, ';');
+        in.ignore(); // Ignore the delimiter
+
+        in >> currRating;
+        in.ignore(); // Ignore the newline character
+
+        // Set the data for the current info object
+        currInfo.set_topic(currTopic);
+        currInfo.set_review(currReview);
+        currInfo.set_rating(currRating);
+
+        // Store the info object in the array
+        tempArray[index++] = currInfo;
     }
 
     in.close();
+
+    // Load data from the temporary array into the table
+    loadFromArray(tempArray, 0, numberOfRecords - 1);
+
+    
+    delete[] tempArray;
 }
 
-
-// save to file
-void Table::saveToFile(const char * fileName) const
+void Table::loadFromArray(info * infoList, int first, int last)
 {
-        ofstream        out;
-
-        out.open(fileName);
-        if(!out)
+        int mid;
+        if(first <= last)
         {
-                cerr << "Fail to open " << fileName << " for writing!" << endl;
-                exit(1);
+                mid = (first + last) / 2;
+                add(infoList[mid]);
+                loadFromArray(infoList, first, mid-1);
+                loadFromArray(infoList, mid+1, last);
         }
-
-        for(int i=0; i<currCapacity; i++)
-        {
-                writeOutChain(out, aTable[i]);
-        }
-        out.close();
 }
+
+void Table::saveToFile(const char* fileName) const {
+    
+    ofstream        out;
+
+    out.open(fileName);
+    if (!out) {
+        cerr << "Fail to open " << fileName << " for writing!" << endl;
+        exit(1);
+    }
+
+    out << this->size << endl;
+    saveToFile(out, this->root);
+
+    out.close();
+}
+
+void Table::saveToFile(ostream& out, Node* currRoot) const {
+    if (currRoot) {
+        saveToFile(out, currRoot->left);
+        out << *(currRoot->data) << endl;
+        saveToFile(out, currRoot->right);
+    }
+}
+
