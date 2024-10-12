@@ -4,6 +4,7 @@
 
 #include "myutil.h"
 
+enum class attendee_type { NONE, KID, ADULT, ANIMAL };
 
 
 class attendee {
@@ -23,30 +24,42 @@ class attendee {
 
 	};
 
+
+
 class child : public attendee {
 
-	private: 
-
 
 	public:
+		child();
+		child(const char * name, attendee_type atype);
+		void display() const;
+	protected:
+		attendee_type atype;
+		
 
-}
+};
 
 class adult : public attendee {
-
-	private:
-
-
 	public:
+		
+		adult();
+		adult(const char * name, attendee_type a_type);
+		void display const;
+	protected:
+		attendee_type a_atype;
+	
 
 	}
 
 class animal : public attendee {
 
-	private:
-
-
 	public:
+		animal();
+		animal(const char * name, attendee_type a_atype);
+		void display const;
+	protected:
+
+		attendee_type a_type;
 
 
 }
